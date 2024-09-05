@@ -9,4 +9,8 @@
 // | Author: yunwuxin <448901948@qq.com>
 // +----------------------------------------------------------------------
 
-return [];
+use app\index\tool\command\OperationData;
+
+return [
+    'OperationData' => OperationData::class,
+];

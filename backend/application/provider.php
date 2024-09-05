@@ -9,6 +9,9 @@
 // | Author: liu21st <liu21st@gmail.com>
 // +----------------------------------------------------------------------
 
+use app\common\tool\provider\User;
+
 // 应用容器绑定定义
 return [
+    'user' => User::class,  // 容器绑定标识 => 实际类
 ];
