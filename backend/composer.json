@@ -38,7 +38,7 @@
     "config": {
         "preferred-install": "dist",
         "allow-plugins": {
-            "topthink/think-installer": false
+            "topthink/think-installer": true
         }
     }
 }
