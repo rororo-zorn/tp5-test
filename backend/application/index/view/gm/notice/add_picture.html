@@ -1,0 +1,41 @@
+{extend name="base/base" /}
+{block name="main"}
+<form class="layui-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">图片地址</label>
+        <div class="layui-input-inline" style="width: 500px">
+            <input type="text" name="picture_url" lay-verify="required" placeholder="请输入图片链接" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">跳转位置</label>
+        <div class="layui-input-inline">
+            <select name="jump_id">
+                <option value="">请选择跳转位置</option>
+                {foreach $jumpId as $key=>$vo }
+                <option value="{$key}">{$vo}</option>
+                {/foreach}
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="submit-add">确定添加</button>
+        </div>
+    </div>
+</form>
+{/block}
+{block name="script"}
+<script>
+    layui.use(['form'], function () {
+        let form = layui.form;
+
+        form.on('submit(submit-add)', function (obj) {
+            parent.addPicture(obj.field);
+            let index = parent.layer.getFrameIndex(window.name);
+            parent.layer.close(index);
+            return false;
+        })
+    });
+</script>
+{/block}

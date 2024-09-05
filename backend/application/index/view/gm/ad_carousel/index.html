@@ -1,0 +1,75 @@
+{extend name="base/base" /}
+{block name="main"}
+<div class="search-box">
+    <blockquote class="layui-elem-quote">广告轮播图配置</blockquote>
+</div>
+<table id="table" lay-filter="table"></table>
+<script type="text/html" id="status">
+    {{#  if(d.enable){ }}
+    <button class="layui-btn layui-btn-xs" style="background-color: #5FB878">开启</button>
+    {{#  } else { }}
+    <button class="layui-btn layui-btn-xs" style="background-color: #c2c2c2">关闭</button>
+    {{#  } }}
+</script>
+<script type="text/html" id="bar">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete">删除</a>
+</script>
+{/block}
+{block name="script"}
+<script>
+    layui.use(['jquery', 'table', 'form'], function () {
+        let $ = layui.jquery,
+            table = layui.table,
+            form = layui.form,
+            tableClos = JSON.parse('{:json_encode($tableClos)}');
+
+        // 执行渲染
+        table.render({
+            elem: '#table',
+            cols: [tableClos],
+            url: '{:url("index/gm.AdCarousel/index")}',
+            height: 'full-200',
+            cellMinWidth: 100,
+            loading: true,
+        });
+
+        // 搜索
+        form.on('submit(search)', function () {
+            table.reload('table', {
+                where: form.val('form')
+            });
+        });
+
+        // 监听工具条
+        table.on('tool(table)', function (obj) {
+                let data = obj.data,
+                    event = obj.event;
+                if (event === 'edit') {
+                    layer.open({
+                        type: 2,
+                        title: '编辑广告轮播图配置-' + data.name,
+                        shadeClose: true,
+                        shade: 0.8,
+                        area: ['80%', '80%'],
+                        content: '{:url("index/gm.AdCarousel/edit")}' + '?id=' + data.id,
+                    });
+                }
+                if (event === 'delete') {
+                    layer.confirm('确定删除' , function () {
+                        $.post('{:url("index/gm.AdCarousel/doDelete")}', {id: data.id},
+                            function (res) {
+                                let icon = res.code == 0 ? 1 : 2;
+                                layer.msg(res.msg, {icon: icon, time: 500}, function () {
+                                    table.reload('table', {
+                                        where: form.val('form')
+                                    });
+                                });
+                            })
+                    });
+                }
+            }
+        );
+    });
+</script>
+{/block}

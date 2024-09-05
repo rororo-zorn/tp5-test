@@ -1,0 +1,66 @@
+{extend name="base/base" /}
+{block name="main"}
+<div class="search-box">
+    <blockquote class="layui-elem-quote">启停服务器</blockquote>
+    <table id="table" lay-filter="table"></table>
+</div>
+<script type="text/html" id="state">
+    {{#  if(d.state == {$stateOn}){ }}
+    <button class="layui-btn layui-btn-xs" style="background-color: #5FB878">开启</button>
+    {{#  } else { }}
+    <button class="layui-btn layui-btn-xs" style="background-color: #D2D2D2">关闭</button>
+    {{#  } }}
+</script>
+<script type="text/html" id="bar">
+    {{#  if(d.state == {$stateOn}){ }}
+    <button class="layui-btn layui-btn-xs" style="background-color: #D2D2D2" lay-event="close">立即关闭</button>
+    {{#  } else { }}
+    <button class="layui-btn layui-btn-xs" style="background-color: #5FB878" lay-event="open">立即开启</button>
+    {{#  } }}
+</script>
+{/block}
+{block name="script"}
+<script>
+    layui.use(['jquery', 'table'], function () {
+        let $ = layui.jquery,
+            table = layui.table,
+            tableClos = JSON.parse('{:json_encode($tableClos)}');
+
+        // 执行渲染
+        table.render({
+            elem: '#table',
+            cols: [tableClos],
+            url: '{:url("index/gm.ServerControl/index")}',
+            height: 'full-150',
+            cellMinWidth: 100,
+            loading: true,
+        });
+
+        // 监听工具条
+        table.on('tool(table)', function (obj) {
+                let event = obj.event;
+                if (event === 'close') {
+                    layer.confirm('确定关闭服务器', function () {
+                        $.post('{:url("index/gm.ServerControl/stop")}', function (res) {
+                            let icon = res.code == 0 ? 1 : 2;
+                            layer.msg(res.msg, {icon: icon, time: 500}, function () {
+                                table.reload('table');
+                            });
+                        })
+                    });
+                }
+                if (event === 'open') {
+                    layer.confirm('确定开启服务器', function () {
+                        $.post('{:url("index/gm.ServerControl/start")}', function (res) {
+                            let icon = res.code == 0 ? 1 : 2;
+                            layer.msg(res.msg, {icon: icon, time: 500}, function () {
+                                table.reload('table');
+                            });
+                        })
+                    });
+                }
+            }
+        );
+    });
+</script>
+{/block}

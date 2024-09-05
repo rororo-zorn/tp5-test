@@ -1,0 +1,124 @@
+{extend name="base/base" /}
+{block name="main"}
+<div class="search-box">
+    <blockquote class="layui-elem-quote">审核服服版本配置</blockquote>
+</div>
+<form class="layui-form">
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">Android</label>
+            <div class="layui-input-inline">
+                <input type="text" name="android_audit_version" value="{$version['auditAndroidVersion']}" placeholder=""
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <div>{:token('token_add_android_audit_version')}</div>
+            <button class="layui-btn" lay-submit lay-filter="android-audit-config">确定</button>
+        </div>
+    </div>
+</form>
+<form class="layui-form">
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">IOS</label>
+            <div class="layui-input-inline">
+                <input type="text" name="ios_audit_version" value="{$version['auditIosVersion']}" placeholder="" autocomplete="off"
+                       class="layui-input">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <div>{:token('token_add_ios_audit_version')}</div>
+            <button class="layui-btn" lay-submit lay-filter="ios-audit-config">确定</button>
+        </div>
+    </div>
+</form>
+<div class="search-box">
+    <blockquote class="layui-elem-quote">正式服版本配置</blockquote>
+</div>
+<form class="layui-form">
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">Android</label>
+            <div class="layui-input-inline">
+                <input type="text" name="android_version" value="{$version['androidVersion']}" placeholder=""
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <div>{:token('token_add_android_version')}</div>
+            <button class="layui-btn" lay-submit lay-filter="android-config">确定</button>
+        </div>
+    </div>
+</form>
+<form class="layui-form">
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">IOS</label>
+            <div class="layui-input-inline">
+                <input type="text" name="ios_version" value="{$version['iosVersion']}" placeholder="" autocomplete="off"
+                       class="layui-input">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <div>{:token('token_add_ios_version')}</div>
+            <button class="layui-btn" lay-submit lay-filter="ios-config">确定</button>
+        </div>
+    </div>
+</form>
+{/block}
+{block name="script"}
+<script>
+    layui.use(['jquery', 'form'], function () {
+        let $ = layui.jquery,
+            form = layui.form;
+
+        function showMsg(res) {
+            var icon = res.code == 0 ? 1 : 2;
+            layer.msg(res.msg, {icon: icon, time: 500}, function () {
+                window.location.reload();
+            });
+        }
+
+        // android audit
+        form.on('submit(android-audit-config)', function (obj) {
+            layer.confirm('确定编辑Android审核服版本', function () {
+                $.post('{:url("index/gm.GameVersion/androidAuditConfig")}', obj.field, function (res) {
+                    showMsg(res);
+                });
+            });
+            return false
+        });
+
+        // ios audit
+        form.on('submit(ios-audit-config)', function (obj) {
+            layer.confirm('确定编辑IOS审核服版本', function () {
+                $.post('{:url("index/gm.GameVersion/iosAuditConfig")}', obj.field, function (res) {
+                    showMsg(res);
+                });
+            });
+            return false
+        });
+
+        // android
+        form.on('submit(android-config)', function (obj) {
+            layer.confirm('确定编辑Android正式服版本', function () {
+                $.post('{:url("index/gm.GameVersion/androidConfig")}', obj.field, function (res) {
+                    showMsg(res);
+                });
+            });
+            return false
+        });
+
+        // ios
+        form.on('submit(ios-config)', function (obj) {
+            layer.confirm('确定编辑IOS正式服版本', function () {
+                $.post('{:url("index/gm.GameVersion/iosConfig")}', obj.field, function (res) {
+                    showMsg(res);
+                });
+            });
+            return false
+        });
+    });
+</script>
+{/block}

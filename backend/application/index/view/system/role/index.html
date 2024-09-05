@@ -1,0 +1,138 @@
+{extend name="base/base" /}
+{block name="main"}
+<div class="search-box">
+    <div class="layui-form" lay-filter="form">
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <button class="layui-btn layui-btn-normal" id="add-role">新建角色</button>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">角色名称</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="role_name" placeholder="支持模糊查找" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <button class="layui-btn" lay-submit lay-filter="search">搜索</button>
+            </div>
+        </div>
+    </div>
+</div>
+<table id="table" lay-filter="table"></table>
+<script type="text/html" id="bar">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑名称</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="authentication">身份验证</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="privilege">权限</a>
+    {{#  if( d.user_num ){ }}
+    <a class="layui-btn layui-btn-disabled layui-btn-xs" lay-event="">删除</a>
+    {{#  } else { }}
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete">删除</a>
+    {{#  } }}
+</script>
+{/block}
+{block name="script"}
+<script>
+    layui.use(['jquery', 'table', 'form'], function () {
+        let table = layui.table,
+            $ = layui.jquery,
+            form = layui.form,
+            tableClos = JSON.parse('{:json_encode($tableClos)}');
+
+        // 新建配置
+        $('#add-role').bind({
+            click: function () {
+                layer.open({
+                    type: 2,
+                    title: '新建角色',
+                    shadeClose: true,
+                    shade: 0.8,
+                    area: ['80%', '80%'],
+                    content: '{:url("index/system.Role/add")}',
+                });
+            }
+        });
+
+        // 执行渲染
+        table.render({
+            elem: '#table',
+            cols: [tableClos],
+            url: '{:url("index/system.Role/index")}',
+            height: 'full-200',
+            cellMinWidth: 100,
+            limit: limit,
+            limits: limits,
+            page: true,
+            loading: true,
+        });
+
+        // 搜索
+        form.on('submit(search)', function () {
+            table.reload('table', {
+                where: form.val('form'),
+                page: {
+                    curr: 1,
+                },
+            });
+        });
+
+        // 监听工具条
+        table.on('tool(table)', function (obj) {
+                let data = obj.data,
+                event = obj.event;
+                if (event === 'edit') {
+                    layer.open({
+                        type: 2,
+                        title: '编辑角色名称',
+                        shadeClose: true,
+                        shade: 0.8,
+                        area: ['80%', '80%'],
+                        content: '{:url("index/system.Role/editRoleName")}' + '?id=' + data.id,
+                    });
+                }
+                if (event === 'authentication') {
+                    $.get('{:url("index/system.Role/getGoogleQRCodeUrl")}', {id: data.id}, function (res) {
+                        if (res.code == 0) {
+                            layer.open({
+                                title: data.role_name,
+                                type: 1,
+                                area: ['250px', '290px'],
+                                scrollbar: false,
+                                shadeClose: true,
+                                shade: 0.8,
+                                content: '<div style="padding:20px;"><img src=' + res.data + '></div>',
+                            });
+                        } else {
+                            layer.msg(res.msg, {icon: 2});
+                        }
+                    })
+                }
+                if (event === 'privilege') {
+                    layer.open({
+                        type: 2,
+                        title: data.role_name,
+                        shadeClose: true,
+                        shade: 0.8,
+                        area: ['80%', '80%'],
+                        content: '{:url("index/system.Role/showPrivilege")}' + '?id=' + data.id,
+                    });
+                }
+                if (event === 'delete') {
+                    layer.confirm('确定删除', function () {
+                        $.post('{:url("index/system.Role/doDelete")}', {id: data.id},
+                            function (res) {
+                                let icon = res.code == 0 ? 1 : 2;
+                                layer.msg(res.msg, {icon: icon, time: 500}, function () {
+                                    table.reload('table', {
+                                        where: form.val('form')
+                                    });
+                                });
+                            })
+                    });
+                }
+            }
+        );
+    });
+</script>
+{/block}

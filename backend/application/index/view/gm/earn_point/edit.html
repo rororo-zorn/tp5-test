@@ -1,0 +1,125 @@
+{extend name="base/base" /}
+{block name="css"}
+<style>
+    .layui-input-block {
+        width: 500px;
+    }
+</style>
+{/block}
+{block name="main"}
+<form class="layui-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">兑换码ID</label>
+        <div class="layui-input-inline">
+            <input type="text" name="redeem_code_id" value="{$model['redeem_code_id']}" lay-verify="required"
+                   placeholder="请输入兑换码ID" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">备注</label>
+        <div class="layui-input-inline">
+            <input type="text" name="remark" value="{$model['remark']}" placeholder="请输入备注信息" autocomplete="off"
+                   class="layui-input">
+        </div>
+        <div class="layui-form-mid layui-word-aux">备注信息必须在64个字符以内</div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">礼包ID</label>
+        <div class="layui-input-inline">
+            <input type="text" name="gift_pack_id" value="{$model['gift_pack_id']}" lay-verify="required"
+                   placeholder="请输入领取礼包ID" autocomplete="off"
+                   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">开始时间</label>
+            <div class="layui-input-inline">
+                <input type="text" name="start_time" id="start_time" value="{$model['start_time']}"
+                       lay-verify="required" placeholder="yyyy-MM-dd HH:00:00" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">截止时间</label>
+            <div class="layui-input-inline">
+                <input type="text" name="end_time" id="end_time" value="{$model['end_time']}" lay-verify="required"
+                       placeholder="yyyy-MM-dd HH:00:00" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">领取限制</label>
+        <div class="layui-input-inline">
+            <select name="receive_limit" lay-verify="required">
+                <option value="">请选择领取限制类型</option>
+                {foreach $model::getReceiveLimitType() as $key=>$vo }
+                <option value="{$key}" {if $model['receive_limit'] == $key}selected{/if}>{$vo}</option>
+                {/foreach}
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">星级下限</label>
+        <div class="layui-input-inline">
+            <input type="number" name="star_lower_limit" value="{$model['star_lower_limit']}" lay-verify="required"
+                   placeholder="请输入星级下限" autocomplete="off" class="layui-input">
+        </div>
+        <div class="layui-form-mid layui-word-aux">范围：0-999；配置0：不设该限制，配置1-999：具体限制等级</div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">星级上限</label>
+        <div class="layui-input-inline">
+            <input type="number" name="star_upper_limit" value="{$model['star_upper_limit']}" lay-verify="required"
+                   placeholder="请输入星级上限" autocomplete="off" class="layui-input">
+        </div>
+        <div class="layui-form-mid layui-word-aux">范围：0-999；配置0：不设该限制，配置1-999：具体限制等级</div>
+    </div>
+    <div>{:token('token_edit_redeem_code')}</div>
+    <div class="layui-form-item">
+        <div><input type="hidden" name="id" value="{$model['id']}"></div>
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="submit-edit">确定编辑</button>
+        </div>
+    </div>
+</form>
+{/block}
+{block name="script"}
+<script>
+    layui.use(['jquery', 'form', 'laydate'], function () {
+        let $ = layui.jquery,
+            form = layui.form,
+            laydate = layui.laydate;
+
+        // 日期
+        laydate.render({
+            elem: '#start_time',
+            type: 'datetime',
+            trigger: 'click',
+            format: 'yyyy-MM-dd HH:00:00',
+        });
+
+        laydate.render({
+            elem: '#end_time',
+            type: 'datetime',
+            trigger: 'click',
+            format: 'yyyy-MM-dd HH:00:00',
+        });
+
+        // 监听提交
+        form.on('submit(submit-edit)', function (obj) {
+            $.post('{:url("index/gm.RedeemCode/doEdit")}', obj.field, function (res) {
+                if (res.code == 0) {
+                    layer.msg(res.msg, {icon: 1, time: 500}, function () {
+                        let index = parent.layer.getFrameIndex(window.name);
+                        parent.layer.close(index);
+                        parent.layui.table.reload('table');
+                    });
+                } else {
+                    layer.msg(res.msg, {icon: 2});
+                }
+            });
+            return false
+        });
+    });
+</script>
+{/block}

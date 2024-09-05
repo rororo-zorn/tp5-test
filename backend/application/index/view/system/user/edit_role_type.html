@@ -1,0 +1,47 @@
+{extend name="base/base" /}
+{block name="main"}
+<form class="layui-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">角色类型</label>
+        <div class="layui-input-inline">
+            <select name="role_id" lay-verify="required">
+                <option value="">请选角色类型</option>
+                {foreach $roleType as $key=>$vo }
+                <option value="{$key}" {if $key == $model['role_id']}selected{/if}>{$vo}</option>
+                {/foreach}
+            </select>
+        </div>
+    </div>
+    <div>{:token('token_edit_role_type')}</div>
+    <div class="layui-form-item">
+        <div><input type="hidden" name="id" value="{$model['id']}"></div>
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="submit-edit">确定编辑</button>
+        </div>
+    </div>
+</form>
+{/block}
+{block name="script"}
+<script>
+    layui.use(['jquery', 'form'], function () {
+        let $ = layui.jquery,
+            form = layui.form;
+
+        // 监听提交
+        form.on('submit(submit-edit)', function (obj) {
+            $.post('{:url("index/system.User/doEditRoleType")}', obj.field, function (res) {
+                if (res.code == 0) {
+                    layer.msg(res.msg, {icon: 1, time: 500}, function () {
+                        let index = parent.layer.getFrameIndex(window.name);
+                        parent.layer.close(index);
+                        parent.layui.table.reload('table');
+                    });
+                } else {
+                    layer.msg(res.msg, {icon: 2});
+                }
+            });
+            return false
+        })
+    });
+</script>
+{/block}

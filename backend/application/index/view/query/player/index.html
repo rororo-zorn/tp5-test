@@ -1,0 +1,86 @@
+{extend name="base/base" /}
+{block name="main"}
+<div class="search-box">
+    <div class="layui-form" lay-filter="form">
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">玩家ID</label>
+                <div class="layui-input-inline">
+                    <input type="number" name="id" placeholder="" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">玩家昵称</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="nickname" placeholder="" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">注册时间</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="start_time" id="start_time" placeholder="yyyy-MM-dd HH:mm:ss"
+                           autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-mid">-</div>
+                <div class="layui-input-inline">
+                    <input type="text" name="end_time" id="end_time" placeholder="yyyy-MM-dd HH:mm:ss"
+                           autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <button class="layui-btn" lay-submit lay-filter="search">搜索</button>
+            </div>
+        </div>
+    </div>
+</div>
+<table id="table" lay-filter="table"></table>
+{/block}
+{block name="script"}
+<script>
+    layui.use(['table', 'form', 'laydate'], function () {
+        let table = layui.table,
+            form = layui.form,
+            laydate = layui.laydate,
+            tableClos = JSON.parse('{:json_encode($tableClos)}');
+
+        // 日期
+        laydate.render({
+            elem: '#start_time',
+            type: 'datetime',
+            trigger: 'click',
+            format: 'yyyy-MM-dd HH:mm:ss',
+        });
+
+        laydate.render({
+            elem: '#end_time',
+            type: 'datetime',
+            trigger: 'click',
+            format: 'yyyy-MM-dd HH:mm:ss',
+        });
+
+        // 执行渲染
+        table.render({
+            elem: '#table',
+            cols: [tableClos],
+            url: '{:url("index/query.Player/index")}',
+            where: form.val('form'),
+            height: 'full-180',
+            cellMinWidth: 100,
+            limit: limit,
+            limits: limits,
+            page: true,
+            loading: true,
+        });
+
+        // 搜索
+        form.on('submit(search)', function () {
+            table.reload('table', {
+                where: form.val('form'),
+                page: {
+                    curr: 1,
+                },
+            });
+        });
+    });
+</script>
+{/block}

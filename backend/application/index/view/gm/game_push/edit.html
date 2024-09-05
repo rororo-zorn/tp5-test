@@ -1,0 +1,186 @@
+{extend name="base/base" /}
+{block name="css"}
+<style>
+    .layui-form-label {
+        width: 100px;
+    }
+
+    .layui-input-block {
+        margin-left: 130px;
+        width: 500px;
+    }
+</style>
+{/block}
+{block name="main"}
+<form class="layui-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">推送类型</label>
+        <div class="layui-input-inline">
+            <select name="push_type" lay-verify="required">
+                <option value="">请选择推送类型</option>
+                {foreach $model::getPushType() as $key=>$vo }
+                <option value="{$key}" {if $model->getData('push_type') == $key}selected{/if}>{$vo}</option>
+                {/foreach}
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">发送对象</label>
+        <div class="layui-input-inline">
+            <select name="send_type" lay-verify="required" lay-filter="send-type">
+                <option value="">请选择发送对象</option>
+                {foreach $model::getSendType() as $key=>$vo }
+                <option value="{$key}" {if $model->getData('send_type') == $key}selected{/if}>{$vo}</option>
+                {/foreach}
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item layui-hide designated">
+        <label class="layui-form-label">指定玩家</label>
+        <div class="layui-input-inline" style="width: 500px">
+            <input type="text" name="uid" value="{$model['uid']}" placeholder="请输入指定玩家ID" autocomplete="off" class="layui-input">
+        </div>
+        <div class="layui-form-mid layui-word-aux">多个玩家ID请用,隔开（英文逗号）</div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">推送标题</label>
+        <div class="layui-input-inline" style="width: 500px">
+            <input type="text" name="title" value="{$model['title']}" lay-verify="required" placeholder="请输入推送标题"
+                   autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">推送内容</label>
+        <div class="layui-input-block">
+            <textarea name="content" placeholder="请输入内容" class="layui-textarea">{$model['content']}</textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">推送图片</label>
+        <div class="layui-input-inline" style="width: 500px">
+            <input type="text" name="image" value="{$model['image']}" placeholder="请输入推送图片地址" autocomplete="off" class="layui-input">
+        </div>
+        <div class="layui-form-mid layui-word-aux">选填</div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">生效日期</label>
+            <div class="layui-input-inline">
+                <input type="text" name="start_time" id="start_time" value="{$model['start_time']}"
+                       lay-verify="required" placeholder="yyyy-MM-dd" autocomplete="off" class="layui-input">
+            </div>
+            <div class="layui-form-mid">-</div>
+            <div class="layui-input-inline">
+                <input type="text" name="end_time" id="end_time" value="{$model['end_time']}" lay-verify="required"
+                       placeholder="yyyy-MM-dd" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">开始时间</label>
+        <div class="layui-input-inline">
+            <input type="text" name="push_start_time" id="push_start_time" value="{$model['push_start_time']}"
+                   lay-verify="required" placeholder="HH:mm" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">推送间隔</label>
+            <div class="layui-input-inline">
+                <input type="number" name="push_interval" value="{$model['push_interval']}" lay-verify="required"
+                       placeholder="请输入推送间隔" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">间隔单位</label>
+            <div class="layui-input-inline">
+                <select name="push_interval_unit" lay-verify="required">
+                    {foreach $model::getPushIntervalUnit() as $key=>$vo }
+                    <option value="{$key}" {if $model->getData('push_interval_unit') == $key}selected{/if}>{$vo}</option>
+                    {/foreach}
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">推送次数</label>
+        <div class="layui-input-inline">
+            <input type="number" name="push_times" value="{$model['push_times']}" lay-verify="required"
+                   placeholder="请输入推送次数" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div>{:token('token_edit_game_push')}</div>
+    <div class="layui-form-item">
+        <div><input type="hidden" name="id" value="{$model['id']}"></div>
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="submit-edit">确定编辑</button>
+        </div>
+    </div>
+</form>
+{/block}
+{block name="script"}
+<script>
+    layui.use(['jquery', 'form', 'element', 'laydate'], function () {
+        let $ = layui.jquery,
+            form = layui.form,
+            laydate = layui.laydate;
+
+        // 日期
+        laydate.render({
+            elem: '#start_time',
+            type: 'date',
+            trigger: 'click',
+            format: 'yyyy-MM-dd',
+        });
+
+        laydate.render({
+            elem: '#end_time',
+            type: 'date',
+            trigger: 'click',
+            format: 'yyyy-MM-dd',
+        });
+
+        laydate.render({
+            elem: '#push_start_time',
+            type: 'time',
+            trigger: 'click',
+            format: 'HH:mm',
+        });
+
+        // 发送对象选择
+        function selectedSendTo(value) {
+            const designatedId = $('input[name="uid"]');
+            const designated = $('.designated');
+            designated.addClass('layui-hide');
+            designatedId.removeAttr('lay-verify');
+            if (value == {$model::SEND_TO_DESIGNATED_ID}) {
+                designated.removeClass('layui-hide');
+                designatedId.attr('lay-verify', 'required');
+            }
+        }
+
+        selectedSendTo({$model->getData('send_type')});
+
+        // 监听发送对象选择
+        form.on('select(send-type)', function (data) {
+            selectedSendTo(data.value);
+        });
+
+        // 监听提交
+        form.on('submit(submit-edit)', function (obj) {
+            $.post('{:url("index/gm.GamePush/doEdit")}', obj.field, function (res) {
+                if (res.code == 0) {
+                    layer.msg(res.msg, {icon: 1, time: 500}, function () {
+                        let index = parent.layer.getFrameIndex(window.name);
+                        parent.layer.close(index);
+                        parent.layui.table.reload('table');
+                    });
+                } else {
+                    layer.msg(res.msg, {icon: 2});
+                }
+            });
+            return false
+        });
+    });
+</script>
+{/block}

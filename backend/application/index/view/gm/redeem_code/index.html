@@ -1,0 +1,132 @@
+{extend name="base/base" /}
+{block name="main"}
+<div class="search-box">
+    <div class="layui-form" lay-filter="form">
+        <div class="layui-form-item">
+            <button class="layui-btn layui-btn-normal" id="add-redeem-code">新建兑换码</button>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">兑换码ID</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="id" placeholder="" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            {include file="base/time_without_default"}
+            <div class="layui-inline">
+                <label class="layui-form-label">领取类型</label>
+                <div class="layui-input-inline">
+                    <select name="exchange_type">
+                        <option value=""></option>
+                        {foreach $model::getExchangeType() as $key=>$vo }
+                        <option value="{$key}">{$vo}</option>
+                        {/foreach}
+                    </select>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">状态</label>
+                <div class="layui-input-inline">
+                    <select name="status">
+                        <option value=""></option>
+                        {foreach $model::getStatus() as $key=>$vo }
+                        <option value="{$key}">{$vo['msg']}</option>
+                        {/foreach}
+                    </select>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <button class="layui-btn" lay-submit lay-filter="search">搜索</button>
+            </div>
+        </div>
+    </div>
+</div>
+<table id="table" lay-filter="table"></table>
+<script type="text/html" id="show-item">
+    <a class="layui-btn layui-btn-xs" lay-event="show-item">点击查看</a>
+</script>
+<script type="text/html" id="status">
+    {{#  if(d.status){ }}
+    <button class="layui-btn layui-btn-xs" style="background-color: #5FB878">可领取</button>
+    {{#  } else { }}
+    <button class="layui-btn layui-btn-xs" style="background-color: #c2c2c2">不可领取</button>
+    {{#  } }}
+</script>
+{/block}
+{block name="script"}
+<script>
+    layui.use(['jquery', 'table', 'form', 'laydate'], function () {
+        let table = layui.table,
+            $ = layui.jquery,
+            form = layui.form,
+            laydate = layui.laydate,
+            tableClos = JSON.parse('{:json_encode($model::getLayUiTableClos())}');
+
+        // 日期
+        laydate.render({
+            elem: '#start_time',
+            type: 'datetime',
+            trigger: 'click',
+            format: 'yyyy-MM-dd HH:mm:ss',
+        });
+
+        laydate.render({
+            elem: '#end_time',
+            type: 'datetime',
+            trigger: 'click',
+            format: 'yyyy-MM-dd HH:mm:ss',
+        });
+
+        // 新建兑换码
+        $('#add-redeem-code').bind({
+            click: function () {
+                layer.open({
+                    type: 2,
+                    title: '新建兑换码',
+                    shadeClose: true,
+                    shade: 0.8,
+                    area: ['80%', '80%'],
+                    content: '{:url("index/gm.RedeemCode/add")}',
+                });
+            }
+        });
+
+        // 执行渲染
+        table.render({
+            elem: '#table',
+            cols: [tableClos],
+            url: '{:url("index/gm.RedeemCode/index")}',
+            height: 'full-200',
+            cellMinWidth: 100,
+            limit: limit,
+            limits: limits,
+            page: true,
+            loading: true,
+        });
+
+        // 搜索
+        form.on('submit(search)', function () {
+            table.reload('table', {
+                where: form.val('form')
+            });
+        });
+
+        // 监听工具条
+        table.on('tool(table)', function (obj) {
+                let data = obj.data,
+                    event = obj.event;
+                if (event === 'show-item') {
+                    layer.open({
+                        type: 2,
+                        title: '奖励列表',
+                        shadeClose: true,
+                        shade: 0.8,
+                        area: ['80%', '80%'],
+                        content: '{:url("index/gm.RedeemCode/showItem")}' + '?id=' + data.id,
+                    });
+                }
+            }
+        );
+    });
+</script>
+{/block}

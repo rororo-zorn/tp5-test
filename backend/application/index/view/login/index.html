@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>登录</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="__STATIC__/layuiadmin/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="__STATIC__/layuiadmin/style/admin.css" media="all">
+    <link rel="stylesheet" href="__STATIC__/layuiadmin/style/login.css" media="all">
+</head>
+<body>
+<div class="layadmin-user-login layadmin-user-display-show" id="LAY-user-login" style="display: none;">
+    <div class="layadmin-user-login-main">
+        <div class="layadmin-user-login-box layadmin-user-login-header">
+            <h2>{$appName}</h2>
+        </div>
+        <div class="layadmin-user-login-box layadmin-user-login-body layui-form">
+            <div class="layui-form-item">
+                <label class="layadmin-user-login-icon layui-icon layui-icon-username"></label>
+                <input type="text" name="username" lay-verify="required" placeholder="账号" class="layui-input">
+            </div>
+            <div class="layui-form-item">
+                <label class="layadmin-user-login-icon layui-icon layui-icon-password"></label>
+                <input type="password" name="password" lay-verify="required" placeholder="密码" class="layui-input">
+            </div>
+<!--            <div class="layui-form-item">-->
+<!--                <label class="layadmin-user-login-icon layui-icon layui-icon-vercode"></label>-->
+<!--                <input type="number" name="google_code" lay-verify="required" placeholder="谷歌验证码" class="layui-input">-->
+<!--            </div>-->
+            <div>{:token('token_login')}</div>
+            <div class="layui-form-item">
+                <button class="layui-btn layui-btn-fluid" id="submit-login" lay-submit lay-filter="submit-login">登&nbsp;&nbsp;&nbsp;&nbsp;录
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="__STATIC__/layuiadmin/layui/layui.js"></script>
+<script>
+    // 解决iframe退出系统显示问题
+    if (window.top != window) {
+        window.top.location.href = document.location.href;
+    }
+
+    layui.use(['jquery', 'form'], function () {
+        let $ = layui.jquery,
+            form = layui.form;
+
+        // 监听提交
+        form.on('submit(submit-login)', function (obj) {
+            $.post('{:url("index/Login/doLogin")}', obj.field, function (res) {
+                if (res.code == 0) {
+                    layer.msg(res.msg, {icon: 1, time: 500}, function () {
+                        location.href = res.data;
+                    });
+                } else {
+                    layer.msg(res.msg, {icon: 2});
+                }
+            });
+            return false
+        })
+
+        // 回车提交
+        document.onkeydown = function (e) {
+            let event = e || window.event;
+            if (event.keyCode == 13) {
+                $("#submit-login").click();
+                return false;
+            }
+        }
+    });
+</script>
+</body>
+</html>

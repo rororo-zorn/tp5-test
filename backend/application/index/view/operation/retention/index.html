@@ -1,0 +1,96 @@
+{extend name="base/base" /}
+{block name="main"}
+<div class="search-box">
+    <div class="layui-form" lay-filter="form">
+        <div class="layui-form-item">
+            {include file="base/time_default_sevenday"}
+            <div class="layui-inline">
+                <label class="layui-form-label">平台</label>
+                <div class="layui-inline">
+                    <select name="platform">
+                        <option value="">所有平台</option>
+                        {foreach $platform as $key=>$vo }
+                        <option value="{$key}">{$vo}</option>
+                        {/foreach}
+                    </select>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">渠道</label>
+                <div class="layui-inline">
+                    <select name="channel">
+                        <option value="">所有渠道</option>
+                        {foreach $channel as $key=>$vo }
+                        <option value="{$key}">{$vo}</option>
+                        {/foreach}
+                    </select>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <button class="layui-btn" lay-submit lay-filter="search">搜索</button>
+            </div>
+<!--            <div class="layui-inline">-->
+<!--                <button class="layui-btn" lay-submit lay-filter="export">导出</button>-->
+<!--            </div>-->
+        </div>
+    </div>
+</div>
+<table id="table" lay-filter="table"></table>
+{/block}
+{block name="script"}
+<script>
+    layui.use(['table', 'form', 'jquery', 'laydate'], function () {
+        let table = layui.table,
+            form = layui.form,
+            $ = layui.jquery,
+            laydate = layui.laydate,
+            tableClos = JSON.parse('{:json_encode($tableClos)}');
+
+        // 日期
+        laydate.render({
+            elem: '#start_time',
+            type: 'date',
+            trigger: 'click',
+            format: 'yyyy-MM-dd',
+        });
+
+        laydate.render({
+            elem: '#end_time',
+            type: 'date',
+            trigger: 'click',
+            format: 'yyyy-MM-dd',
+        });
+
+        // 执行渲染
+        table.render({
+            elem: '#table',
+            cols: [tableClos],
+            url: '{$showUrl}',
+            where: form.val('form'),
+            height: 'full-150',
+            cellMinWidth: 100,
+            loading: true,
+            toolbar: true,
+            defaultToolbar: ['exports'],
+        });
+
+        // 搜索
+        form.on('submit(search)', function () {
+            table.reload('table', {
+                where: form.val('form'),
+            });
+        });
+
+        // 导出
+        // form.on('submit(export)', function () {
+        //     layer.msg('导出请求中，请勿重复点击~', {icon: 1});
+        //     let param = form.val('form');
+        //     const a = window.document.createElement('a');
+        //     a.href = '{$exportUrl}' + '?' + $.param(param);
+        //     document.body.appendChild(a);
+        //     a.click();
+        //     document.body.removeChild(a);
+        // });
+    });
+</script>
+{/block}

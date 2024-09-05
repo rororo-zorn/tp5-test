@@ -1,0 +1,118 @@
+{extend name="base/base" /}
+{block name="main"}
+<div class="search-box">
+    <div class="layui-form" lay-filter="form">
+        <div class="layui-form-item">
+            <button class="layui-btn layui-btn-normal" id="add-notice">新建白名单</button>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">玩家ID</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="uid" placeholder="" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <button class="layui-btn" lay-submit lay-filter="search">搜索</button>
+            </div>
+        </div>
+    </div>
+</div>
+<table id="table" lay-filter="table"></table>
+<!--<script type="text/html" id="header-bar">-->
+<!--    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="batch-delete">批量删除</a>-->
+<!--</script>-->
+<script type="text/html" id="bar">
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete">删除</a>
+</script>
+{/block}
+{block name="script"}
+<script>
+    layui.use(['jquery', 'table', 'form'], function () {
+        let table = layui.table,
+            $ = layui.jquery,
+            form = layui.form,
+            tableClos = JSON.parse('{:json_encode($tableClos)}');
+
+        // 新建白名单
+        $('#add-notice').bind({
+            click: function () {
+                layer.open({
+                    type: 2,
+                    title: '新建白名单',
+                    shadeClose: true,
+                    shade: 0.8,
+                    area: ['80%', '80%'],
+                    content: '{:url("index/gm.Whitelist/add")}',
+                });
+            }
+        });
+
+        // 执行渲染
+        table.render({
+            elem: '#table',
+            cols: [tableClos],
+            url: '{:url("index/gm.Whitelist/index")}',
+            height: 'full-200',
+            cellMinWidth: 100,
+            loading: true,
+            toolbar: '#header-bar',
+            defaultToolbar: ['exports'],
+        });
+
+        // 搜索
+        form.on('submit(search)', function () {
+            table.reload('table', {
+                where: form.val('form')
+            });
+        });
+
+        // 头工具栏
+        // table.on('toolbar(table)', function (obj) {
+        //     let event = obj.event;
+        //     if (event === 'batch-delete') {
+        //         let data = table.checkStatus(obj.config.id).data;
+        //         let uid = [];
+        //         $.each(data, function (key, value) {
+        //             uid[key] = value.uid;
+        //         })
+        //         if (uid.length === 0) {
+        //             layer.msg('请选择需要删除的玩家ID', {icon: 2});
+        //             return;
+        //         }
+        //         layer.confirm('确定删除', function () {
+        //             $.post('{:url("index/gm.Whitelist/doDelete")}', {uid: uid},
+        //                 function (res) {
+        //                     let icon = res.code == 0 ? 1 : 2;
+        //                     layer.msg(res.msg, {icon: icon, time: 500}, function () {
+        //                         table.reload('table', {
+        //                             where: form.val('form')
+        //                         });
+        //                     });
+        //                 })
+        //         });
+        //     }
+        // });
+
+        // 监听工具条
+        table.on('tool(table)', function (obj) {
+                let data = obj.data,
+                    event = obj.event;
+                if (event === 'delete') {
+                    layer.confirm('确定删除', function () {
+                        $.post('{:url("index/gm.Whitelist/doDelete")}', {uid: data.uid},
+                            function (res) {
+                                let icon = res.code == 0 ? 1 : 2;
+                                layer.msg(res.msg, {icon: icon, time: 500}, function () {
+                                    table.reload('table', {
+                                        where: form.val('form')
+                                    });
+                                });
+                            })
+                    });
+                }
+            }
+        );
+    });
+</script>
+{/block}

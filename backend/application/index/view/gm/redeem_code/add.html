@@ -1,0 +1,156 @@
+{extend name="base/base" /}
+{block name="main"}
+<form class="layui-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">领取类型</label>
+        <div class="layui-input-inline">
+            <select name="type" lay-verify="required">
+                <option value="">请选择领取类型</option>
+                {foreach $model::getExchangeType() as $key=>$vo }
+                <option value="{$key}">{$vo}</option>
+                {/foreach}
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">兑换码数量</label>
+        <div class="layui-input-inline">
+            <input type="number" name="count" lay-verify="required" placeholder="请输入兑换码数量" autocomplete="off"
+                   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">兑换奖励</label>
+        <div class="layui-input-inline">
+            <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" id="add-item">
+                <i class="layui-icon">&#xe654;</i>
+            </button>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <table id="table" lay-filter="table"></table>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">开始时间</label>
+        <div class="layui-input-inline">
+            <input type="text" name="startTime" id="start_time" lay-verify="required" placeholder="yyyy-MM-dd HH:mm:ss"
+                   autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">截止时间</label>
+        <div class="layui-input-inline">
+            <input type="text" name="endTime" id="end_time" lay-verify="required" placeholder="yyyy-MM-dd HH:mm:ss"
+                   autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div>{:token('token_add_redeem_code')}</div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="submit-add">确定添加</button>
+        </div>
+    </div>
+</form>
+<script type="text/html" id="bar">
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete-item">删除</a>
+</script>
+{/block}
+{block name="script"}
+<script>
+    layui.use(['jquery', 'form', 'laydate', 'table'], function () {
+        let $ = layui.jquery,
+            form = layui.form,
+            laydate = layui.laydate,
+            table = layui.table,
+            dataArr = [],   // 存放table数据
+            item = JSON.parse('{:json_encode($model::getItem())}'),
+            tableClos = JSON.parse('{:json_encode($model::getItemTableFields())}');
+
+        // 奖励表格渲染
+        table.render({
+            elem: '#table',
+            cols: [tableClos],
+            data: dataArr,
+            size: 'sm',
+        });
+
+        // 日期
+        laydate.render({
+            elem: '#start_time',
+            type: 'datetime',
+            trigger: 'click',
+            format: 'yyyy-MM-dd HH:mm:ss',
+        });
+
+        laydate.render({
+            elem: '#end_time',
+            type: 'datetime',
+            trigger: 'click',
+            format: 'yyyy-MM-dd HH:mm:ss',
+        });
+
+        // 添加奖励
+        $('#add-item').on('click', function () {
+            layer.open({
+                type: 2,
+                title: '新增奖励',
+                shadeClose: true,
+                shade: 0.8,
+                area: ['35%', '70%'],
+                content: '{:url("index/gm.RedeemCode/addItem")}',
+            });
+        });
+
+        // 重载表格
+        function reloadTable() {
+            table.reload('table', {
+                data: dataArr,  // 接受参数为Array
+            })
+        }
+
+        // 重组数组 生成唯一id供操作使用
+        function restructuringArray() {
+            for (let i = 0, length = dataArr.length; i < length; i++) {
+                dataArr[i].index = i;
+            }
+        }
+
+        // 添加奖励
+        window.addItem = function (obj) {
+            obj.name = item[obj.id];
+            dataArr.push(obj);
+            restructuringArray();
+            reloadTable();
+        }
+
+        // 监听工具条
+        table.on('tool(table)', function (obj) {
+            if (obj.event === 'delete-item') {
+                layer.confirm('确定删除', function (index) {
+                    dataArr.splice(obj.data.index, 1);
+                    restructuringArray();
+                    reloadTable();
+                    layer.close(index);
+                });
+            }
+        });
+
+        // 监听提交
+        form.on('submit(submit-add)', function (obj) {
+            obj.field.item = dataArr;
+            $.post('{:url("index/gm.RedeemCode/doAdd")}', obj.field, function (res) {
+                if (res.code == 0) {
+                    layer.msg(res.msg, {icon: 1, time: 500}, function () {
+                        let index = parent.layer.getFrameIndex(window.name);
+                        parent.layer.close(index);
+                        parent.layui.table.reload('table');
+                    });
+                } else {
+                    layer.msg(res.msg, {icon: 2});
+                }
+            });
+            return false
+        });
+    });
+</script>
+{/block}

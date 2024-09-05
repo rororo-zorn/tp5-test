@@ -1,0 +1,59 @@
+{extend name="base/base" /}
+{block name="main"}
+<form class="layui-form">
+    <blockquote class="layui-elem-quote">登录公告</blockquote>
+    {foreach $model::getLanguageList() as $key=>$vo }
+    <div class="layui-form-item">
+        <label class="layui-form-label">{$vo["name"]}</label>
+        <div class="layui-input-inline" style="width: 500px">
+            <textarea name="content[{$key}]" placeholder="请输入公告{$vo['name']}内容" autocomplete="off"
+            class="layui-textarea" lay-verify="required">{$model->$key}</textarea>
+        </div>
+    </div>
+    {/foreach}
+    <div>{:token('token_add_login_notice')}</div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="submit-add">确定添加/编辑</button>
+            <button type="button" class="layui-btn layui-btn-danger" id="delete">删除</button>
+        </div>
+    </div>
+</form>
+{/block}
+{block name="script"}
+<script>
+    layui.use(['jquery', 'form'], function () {
+        let $ = layui.jquery,
+            form = layui.form;
+
+        function showMsg(res) {
+            var icon = res.code == 0 ? 1 : 2;
+            layer.msg(res.msg, {icon: icon, time: 500}, function () {
+                window.location.reload();
+            });
+        }
+
+        // 添加
+        form.on('submit(submit-add)', function (obj) {
+            layer.confirm('确定添加或者编辑', function () {
+                $.post('{:url("index/gm.LoginNotice/doAdd")}', obj.field, function (res) {
+                    showMsg(res);
+                });
+            });
+            return false
+        });
+
+        // 删除
+        $('#delete').bind({
+            click: function () {
+                layer.confirm('确定删除', function () {
+                    $.post('{:url("index/gm.LoginNotice/doDelete")}', function (res) {
+                        showMsg(res);
+                    });
+                });
+                return false
+            }
+        });
+    });
+</script>
+{/block}

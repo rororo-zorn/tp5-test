@@ -1,0 +1,103 @@
+{extend name="base/base" /}
+{block name="css"}
+<link rel="stylesheet" type="text/css" href="__STATIC__/zTree/css/zTreeStyle/zTreeStyle.css"/>
+<style>
+    .layui-elem-field {
+        margin-top: 30px;
+    }
+</style>
+{/block}
+{block name="main"}
+<blockquote class="layui-elem-quote layui-text">编辑权限</blockquote>
+<div>
+    <ul id="my-tree" class="ztree"></ul>
+</div>
+<fieldset class="layui-elem-field layui-field-title"></fieldset>
+<form class="layui-form">
+    <div>{:token('token_edit_privilege')}</div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit lay-filter="submit-edit">确定编辑</button>
+        </div>
+    </div>
+</form>
+{/block}
+{block name="script"}
+<script src="__STATIC__/zTree/js/jquery-1.4.4.min.js"></script>
+<script src="__STATIC__/zTree/js/jquery.ztree.all.js"></script>
+<script>
+    layui.use(['jquery', 'form'], function () {
+        let form = layui.form;
+        let setting = {
+            async: {
+                enable: true, // 采用异步加载
+                dataFilter: ajaxDataFilter,    // 预处理数据
+                url: '{:url("index/system.Role/getPrivilege")}',
+                otherParam: {"id": "{$id}"},
+                type: "get",
+                dataType: "json"
+            },
+            callback: {
+                onAsyncSuccess: zTreeOnAsyncSuccess // 异步加载完成调用
+            },
+            check: {
+                enable: true,
+                chkboxType: {"Y": "ps", "N": "ps"},
+            },
+            data: {
+                key: {
+                    title: "menu_name",
+                    name: "menu_name"
+                },
+                simpleData: {
+                    enable: true,
+                    idKey: "{$zTreeKey['idKey']}",
+                    pIdKey: "{$zTreeKey['pIdKey']}",
+                    rootPid: {$zTreeKey['rootPid']},
+                }
+            }
+        };
+
+        // 获取返回的数据，进行预操作
+        function ajaxDataFilter(treeId, parentNode, responseData) {
+            return responseData.data;
+        }
+
+        // 异步加载完成时运行，此方法将所有的节点打开
+        function zTreeOnAsyncSuccess(event, treeId, msg) {
+            let treeObj = $.fn.zTree.getZTreeObj("my-tree");
+            treeObj.expandAll(true);
+        }
+
+        // tree init
+        $.fn.zTree.init($("#my-tree"), setting, null);
+
+        // 监听提交
+        form.on('submit(submit-edit)', function () {
+            let treeObj = $.fn.zTree.getZTreeObj("my-tree"),
+                nodes = treeObj.getCheckedNodes(true),
+                privilegeIds = [],
+                token;
+            for (let i = 0, length = nodes.length; i < length; i++) {
+                privilegeIds.push(nodes[i].id)
+            }
+            token = $('input[name="token_edit_privilege"]').val();
+            $.post('{:url("index/system.Role/doEditPrivilege")}', {
+                id: '{$id}',
+                privilege_ids: privilegeIds,
+                token_edit_privilege: token
+            }, function (res) {
+                if (res.code == 0) {
+                    layer.msg(res.msg, {icon: 1, time: 500}, function () {
+                        let index = parent.layer.getFrameIndex(window.name);
+                        parent.layer.close(index);
+                    });
+                } else {
+                    layer.msg(res.msg, {icon: 2});
+                }
+                return false;
+            })
+        });
+    });
+</script>
+{/block}

@@ -1,0 +1,128 @@
+{extend name="base/base" /}
+{block name="main"}
+<div class="search-box">
+    <blockquote class="layui-elem-quote">本周配置</blockquote>
+    <div class="layui-form-item">
+        <button class="layui-btn layui-btn-normal layui-btn-sm" id="add-this-week-conf">新建配置</button>
+        <button class="layui-btn layui-btn-sm layui-btn-disabled" disabled id="edit-this-week-conf">编辑</button>
+    </div>
+    <table id="this_week" lay-filter="this_week"></table>
+    <hr>
+    <blockquote class="layui-elem-quote">下周配置</blockquote>
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <button class="layui-btn layui-btn-normal layui-btn-sm" id="add-next-week-conf">新建下周配置</button>
+            <button class="layui-btn layui-btn-sm layui-btn-disabled" disabled id="edit-next-week-conf">编辑</button>
+        </div>
+    </div>
+    <table id="next_week" lay-filter="next_week"></table>
+    <hr>
+</div>
+{/block}
+{block name="script"}
+<script>
+    layui.use(['jquery', 'table'], function () {
+        let $ = layui.jquery,
+            table = layui.table,
+            tableClos = JSON.parse('{:json_encode($tableClos)}');
+
+        function updateBtn(count, addBtn, editBtn) {
+            if (count > 0) {
+                addBtn.addClass('layui-btn-disabled');
+                addBtn.attr('disabled', true);
+                editBtn.removeClass('layui-btn-disabled');
+                editBtn.removeAttr('disabled');
+            } else {
+                addBtn.removeClass('layui-btn-disabled');
+                addBtn.removeAttr('disabled');
+                editBtn.addClass('layui-btn-disabled');
+                editBtn.attr('disabled', true);
+            }
+        }
+
+        // 执行渲染
+        table.render({
+            elem: '#this_week',
+            cols: [tableClos],
+            url: '{:url("index/gm.EarnPoint/showThisWeekConfig")}',
+            cellMinWidth: 100,
+            loading: true,
+            done: function (res) {
+                const addBtn = $('#add-this-week-conf');
+                const editBtn = $('#edit-this-week-conf');
+                updateBtn(res.count, addBtn, editBtn);
+            },
+        });
+
+        // 执行渲染
+        table.render({
+            elem: '#next_week',
+            cols: [tableClos],
+            url: '{:url("index/gm.EarnPoint/showNextWeekConfig")}',
+            cellMinWidth: 100,
+            loading: true,
+            done: function (res) {
+                const addBtn = $('#add-next-week-conf');
+                const editBtn = $('#edit-next-week-conf');
+                updateBtn(res.count, addBtn, editBtn);
+            },
+        });
+
+        // 新建本周配置
+        $('#add-this-week-conf').bind({
+            click: function () {
+                layer.open({
+                    type: 2,
+                    title: '新建本周配置',
+                    shadeClose: true,
+                    shade: 0.8,
+                    area: ['80%', '80%'],
+                    content: '{:url("index/gm.EarnPoint/addThisWeekConfig")}',
+                });
+            }
+        });
+
+        // 编辑本周配置
+        $('#edit-this-week-conf').bind({
+            click: function () {
+                layer.open({
+                    type: 2,
+                    title: '编辑本周配置',
+                    shadeClose: true,
+                    shade: 0.8,
+                    area: ['80%', '80%'],
+                    content: '{:url("index/gm.EarnPoint/editThisWeekConfig")}',
+                });
+            }
+        });
+
+        // 新建下周配置
+        $('#add-next-week-conf').bind({
+            click: function () {
+                layer.open({
+                    type: 2,
+                    title: '新建下周配置',
+                    shadeClose: true,
+                    shade: 0.8,
+                    area: ['80%', '80%'],
+                    content: '{:url("index/gm.EarnPoint/addNextWeekConfig")}',
+                });
+            }
+        });
+
+        // 编辑本周配置
+        $('#edit-next-week-conf').bind({
+            click: function () {
+                layer.open({
+                    type: 2,
+                    title: '编辑下周配置',
+                    shadeClose: true,
+                    shade: 0.8,
+                    area: ['80%', '80%'],
+                    content: '{:url("index/gm.EarnPoint/editNextWeekConfig")}',
+                });
+            }
+        });
+    });
+</script>
+{/block}

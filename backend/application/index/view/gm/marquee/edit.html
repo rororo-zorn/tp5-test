@@ -1,0 +1,135 @@
+{extend name="base/base" /}
+{block name="css"}
+<style>
+    .layui-form-label {
+        width: 100px;
+    }
+
+    .layui-input-block {
+        margin-left: 130px;
+        width: 500px;
+    }
+</style>
+{/block}
+{block name="main"}
+<form class="layui-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">跑马灯类型</label>
+        <div class="layui-input-inline">
+            <select name="marquee_type" lay-verify="required">
+                <option value="">请选择跑马灯类型</option>
+                {foreach $model::getMarqueeType() as $key=>$vo }
+                <option value="{$key}" {if $model->getData('marquee_type') == $key}selected{/if}>{$vo}</option>
+                {/foreach}
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">跑马灯内容</label>
+        <div class="layui-input-block">
+            <textarea name="content" placeholder="请输入内容" class="layui-textarea">{$model['content']}</textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">开始时间</label>
+            <div class="layui-input-inline">
+                <input type="text" name="start_time" id="start_time" value="{$model['start_time']}"
+                       lay-verify="required" placeholder="yyyy-MM-dd" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">截止时间</label>
+            <div class="layui-input-inline">
+                <input type="text" name="end_time" id="end_time" value="{$model['end_time']}" lay-verify="required"
+                       placeholder="yyyy-MM-dd" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">播报开始时间</label>
+        <div class="layui-input-inline">
+            <input type="text" name="broadcast_start_time" id="broadcast_start_time"
+                   value="{$model['broadcast_start_time']}" lay-verify="required" placeholder="HH:mm" autocomplete="off"
+                   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">播报间隔</label>
+        <div class="layui-input-inline">
+            <input type="number" name="broadcast_interval" value="{$model['broadcast_interval']}" lay-verify="required"
+                   placeholder="请输入播报间隔" autocomplete="off" class="layui-input">
+        </div>
+        <div class="layui-form-mid layui-word-aux">单位：分</div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">播报次数</label>
+        <div class="layui-input-inline">
+            <input type="number" name="broadcast_times" value="{$model['broadcast_times']}" lay-verify="required"
+                   placeholder="请输入播报次数" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">备注</label>
+        <div class="layui-input-inline">
+            <input type="text" name="remark" value="{$model['remark']}" placeholder="请输入备注信息" autocomplete="off"
+                   class="layui-input">
+        </div>
+        <div class="layui-form-mid layui-word-aux">备注信息必须在64个字符以内</div>
+    </div>
+    <div>{:token('token_edit_marquee')}</div>
+    <div class="layui-form-item">
+        <div><input type="hidden" name="id" value="{$model['id']}"></div>
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="submit-edit">确定编辑</button>
+        </div>
+    </div>
+</form>
+{/block}
+{block name="script"}
+<script>
+    layui.use(['jquery', 'form', 'element', 'laydate'], function () {
+        let $ = layui.jquery,
+            form = layui.form,
+            laydate = layui.laydate;
+
+        // 日期
+        laydate.render({
+            elem: '#start_time',
+            type: 'date',
+            trigger: 'click',
+            format: 'yyyy-MM-dd',
+        });
+
+        laydate.render({
+            elem: '#end_time',
+            type: 'date',
+            trigger: 'click',
+            format: 'yyyy-MM-dd',
+        });
+
+        laydate.render({
+            elem: '#broadcast_start_time',
+            type: 'time',
+            trigger: 'click',
+            format: 'HH:mm',
+        });
+
+        // 监听提交
+        form.on('submit(submit-edit)', function (obj) {
+            $.post('{:url("index/gm.Marquee/doEdit")}', obj.field, function (res) {
+                if (res.code == 0) {
+                    layer.msg(res.msg, {icon: 1, time: 500}, function () {
+                        let index = parent.layer.getFrameIndex(window.name);
+                        parent.layer.close(index);
+                        parent.layui.table.reload('table');
+                    });
+                } else {
+                    layer.msg(res.msg, {icon: 2});
+                }
+            });
+            return false
+        });
+    });
+</script>
+{/block}

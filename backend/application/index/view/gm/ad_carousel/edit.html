@@ -1,0 +1,82 @@
+{extend name="base/base" /}
+{block name="main"}
+<form class="layui-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">状态</label>
+        <div class="layui-input-block">
+            <input type="hidden" name="enable" value="0">
+            <input type="checkbox" name="enable" value="1" lay-skin="switch" lay-text="开启|关闭" {if $data['enable']}checked{/if}>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">开始时间</label>
+        <div class="layui-input-inline">
+            <input type="text" name="startTime" id="start_time" value="{$data['startTime']}" lay-verify="required"
+                   placeholder="yyyy-MM-dd HH:mm:ss" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">截止时间</label>
+        <div class="layui-input-inline">
+            <input type="text" name="endTime" id="end_time" value="{$data['endTime']}" lay-verify="required"
+                   placeholder="yyyy-MM-dd HH:mm:ss" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div>{:token('token_edit_ad_carousel')}</div>
+    <div class="layui-form-item">
+        <div><input type="hidden" name="id" value="{$data['id']}"></div>
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="edit">确定编辑</button>
+        </div>
+    </div>
+</form>
+{/block}
+{block name="script"}
+<script>
+    layui.use(['jquery', 'form', 'laydate'], function () {
+        let $ = layui.jquery,
+            form = layui.form,
+            laydate = layui.laydate;
+
+        // 日期
+        laydate.render({
+            elem: '#start_time',
+            type: 'datetime',
+            trigger: 'click',
+            format: 'yyyy-MM-dd HH:mm:ss',
+        });
+
+        // 日期
+        laydate.render({
+            elem: '#end_time',
+            type: 'datetime',
+            trigger: 'click',
+            format: 'yyyy-MM-dd HH:mm:ss',
+        });
+
+        //监听指定开关
+        form.on('switch(switchTest)', function(data){
+            layer.msg('开关checked：'+ (this.checked ? 'true' : 'false'), {
+                offset: '6px'
+            });
+            layer.tips('温馨提示：请注意开关状态的文字可以随意定义，而不仅仅是ON|OFF', data.othis)
+        });
+
+        // 监听提交
+        form.on('submit(edit)', function (obj) {
+            $.post('{:url("index/gm.AdCarousel/doEdit")}', obj.field, function (res) {
+                if (res.code == 0) {
+                    layer.msg(res.msg, {icon: 1, time: 500}, function () {
+                        let index = parent.layer.getFrameIndex(window.name);
+                        parent.layer.close(index);
+                        parent.layui.table.reload('table');
+                    });
+                } else {
+                    layer.msg(res.msg, {icon: 2});
+                }
+            });
+            return false
+        });
+    });
+</script>
+{/block}

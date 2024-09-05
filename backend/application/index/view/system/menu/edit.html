@@ -1,0 +1,51 @@
+{extend name="base/base" /}
+{block name="main"}
+<form class="layui-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">菜单名称</label>
+        <div class="layui-input-inline">
+            <input type="text" name="menu_name" value="{$model['menu_name']}" lay-verify="required"
+                   autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">菜单排序</label>
+        <div class="layui-input-inline">
+            <input type="number" name="menu_sort" value="{$model['menu_sort']}" lay-verify="required"
+                   autocomplete="off" class="layui-input">
+        </div>
+        <div class="layui-form-mid layui-word-aux">排序范围1-99</div>
+    </div>
+    <div>{:token('token_edit_menu')}</div>
+    <div class="layui-form-item">
+        <div><input type="hidden" name="id" value="{$model['id']}"></div>
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="submit-edit">确定编辑</button>
+        </div>
+    </div>
+</form>
+{/block}
+{block name="script"}
+<script>
+    layui.use(['jquery', 'form'], function () {
+        let $ = layui.jquery,
+            form = layui.form;
+
+        // 监听提交
+        form.on('submit(submit-edit)', function (obj) {
+            $.post('{:url("index/system.Menu/doEdit")}', obj.field, function (res) {
+                if (res.code == 0) {
+                    layer.msg(res.msg, {icon: 1, time: 500}, function () {
+                        let index = parent.layer.getFrameIndex(window.name);
+                        parent.layer.close(index);
+                        parent.layui.table.reload('table');
+                    });
+                } else {
+                    layer.msg(res.msg, {icon: 2});
+                }
+            });
+            return false
+        })
+    });
+</script>
+{/block}

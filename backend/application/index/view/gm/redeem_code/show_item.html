@@ -1,0 +1,20 @@
+{extend name="base/base" /}
+{block name="main"}
+<table id="table"></table>
+{/block}
+{block name="script"}
+<script>
+    layui.use(['table'], function () {
+        let table = layui.table,
+            tableClos = JSON.parse('{:json_encode($data["tableClos"])}'),
+            dataArr = JSON.parse('{:json_encode($data["item"])}');
+
+        // 附件表格渲染
+        table.render({
+            elem: '#table',
+            cols: [tableClos],
+            data: dataArr,
+        });
+    });
+</script>
+{/block}

@@ -1,0 +1,73 @@
+{extend name="base/base" /}
+{block name="main"}
+<form class="layui-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">活动状态</label>
+        <div class="layui-input-block">
+            <input type="hidden" name="isOpen" value="0">
+            <input type="checkbox" name="isOpen" value="1" lay-skin="switch" lay-text="开启|关闭" {if $model->getIsOpen()}checked{/if}>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">开始时间</label>
+            <div class="layui-input-inline">
+                <input type="text" name="startTime" value="{$model->startTime}" id="start_time"
+                       placeholder="yyyy-MM-dd HH:mm:ss" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">截止时间</label>
+            <div class="layui-input-inline">
+                <input type="text" name="endTime" value="{$model->endTime}" id="end_time"
+                       placeholder="yyyy-MM-dd HH:mm:ss" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="submit-add">确定添加</button>
+        </div>
+    </div>
+</form>
+{/block}
+{block name="script"}
+<script>
+    layui.use(['jquery', 'laydate', 'form'], function () {
+        let $ = layui.jquery,
+            laydate = layui.laydate,
+            form = layui.form;
+
+        // 日期
+        laydate.render({
+            elem: '#start_time',
+            type: 'datetime',
+            trigger: 'click',
+            format: 'yyyy-MM-dd HH:mm:ss',
+        });
+
+        laydate.render({
+            elem: '#end_time',
+            type: 'datetime',
+            trigger: 'click',
+            format: 'yyyy-MM-dd HH:mm:ss',
+        });
+
+        // 监听提交
+        form.on('submit(submit-add)', function (obj) {
+            let msg = obj.field.isOpen == {$model::ACTIVITY_OPEN} ? '开启/编辑' : '关闭';
+            layer.confirm('确定' + msg + '感恩节【折扣礼包】活动', function () {
+                $.post('{:url("index/activity.Thanksgiving/doAddDiscountGiftPackage")}', obj.field, function (res) {
+                    var icon = res.code == 0 ? 1 : 2;
+                    layer.msg(res.msg, {icon: icon, time: 500}, function () {
+                        if (icon == 1) {
+                            window.location.reload();
+                        }
+                    });
+                });
+            });
+            return false
+        });
+    });
+</script>
+{/block}

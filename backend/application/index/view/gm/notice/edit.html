@@ -1,0 +1,342 @@
+{extend name="base/base" /}
+{block name="main"}
+<form class="layui-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">公告类型</label>
+        <div class="layui-input-inline">
+            <select name="notice_type" lay-verify="required">
+                <option value="">请选择公告类型</option>
+                {foreach $model::getNoticeType() as $key=>$vo }
+                <option value="{$key}" {if $key== $model['notice_type']}selected{/if}>{$vo}</option>
+                {/foreach}
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">排序</label>
+        <div class="layui-input-inline">
+            <input type="number" name="sort" value="{$model['sort']}" lay-verify="required" placeholder="请输入排序" autocomplete="off" class="layui-input">
+        </div>
+        <div class="layui-form-mid layui-word-aux">排序范围：1~999</div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">小红点</label>
+        <div class="layui-input-inline">
+            <select name="reddot" lay-verify="required">
+                <option value="">请选择出现方式</option>
+                {foreach $model::getRedDotAppearType() as $key=>$vo }
+                <option value="{$key}" {if $key== $model['reddot']}selected{/if}>{$vo}</option>
+                {/foreach}
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        {foreach $model::getLanguageList() as $key=>$vo }
+        <div class="layui-inline">
+            <label class="layui-form-label">{$vo["name"]}主题</label>
+            <div class="layui-input-inline">
+                <input type="text" name="theme[{$key}]" value="{:get_value($model['theme'], $key)}" placeholder="请输入{$vo['name']}主题" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        {/foreach}
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">主题key</label>
+        <div class="layui-input-inline">
+            <input type="text" name="theme_tid" value="{$model['theme_tid']}" placeholder="请输入公告主题key" autocomplete="off" class="layui-input">
+        </div>
+        <div class="layui-form-mid layui-word-aux">主题和主题key至少填一个</div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">展示类型</label>
+        <div class="layui-input-inline">
+            <select name="show_type" lay-verify="required" lay-filter="show-type">
+                <option value="">请选择展示类型</option>
+                {foreach $model::getShowType() as $key=>$vo }
+                <option value="{$key}" {if $key== $model['show_type']}selected{/if}>{$vo}</option>
+                {/foreach}
+            </select>
+        </div>
+    </div>
+    <div id="extra">
+        {if $model['show_type'] == $model::WORLD_NOTICE}
+        <div class="layui-form-item">
+            {foreach $model::getLanguageList() as $key=>$vo }
+            <div class="layui-inline">
+                <label class="layui-form-label">{$vo["name"]}标题</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="title[{$key}]" value="{:get_value($model['title'], $key)}" placeholder="请输入公告{$vo['name']}标题" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            {/foreach}
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">标题key</label>
+            <div class="layui-input-inline">
+                <input type="text" name="title_tid" value="{$model['title_tid']}" placeholder="请输入公告标题key" autocomplete="off" class="layui-input">
+            </div>
+            <div class="layui-form-mid layui-word-aux">标题和标题key至少填一个</div>
+        </div>
+        {foreach $model::getLanguageList() as $key=>$vo }
+        <div class="layui-form-item">
+            <label class="layui-form-label">{$vo["name"]}内容</label>
+            <div class="layui-input-inline" style="width: 500px">
+                <textarea name="content[{$key}]" placeholder="请输入公告{$vo['name']}内容" autocomplete="off" class="layui-textarea">{:get_value($model['content'], $key)}</textarea>
+            </div>
+        </div>
+        {/foreach}
+        <div class="layui-form-item">
+            <label class="layui-form-label">内容key</label>
+            <div class="layui-input-inline">
+                <input type="text" name="content_tid" value="{$model['content_tid']}" placeholder="请输入公告内容key" autocomplete="off" class="layui-input">
+            </div>
+            <div class="layui-form-mid layui-word-aux">内容和内容key至少填一个</div>
+        </div>
+        <div class="layui-form-item">
+        {foreach $model::getLanguageList() as $key=>$vo }
+        <div class="layui-inline">
+            <label class="layui-form-label">{$vo["name"]}落款</label>
+            <div class="layui-input-inline">
+                <input type="text" name="tail[{$key}]" value="{:get_value($model['tail'], $key)}" placeholder="请输入公告{$vo['name']}落款" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        {/foreach}
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">落款key</label>
+            <div class="layui-input-inline">
+                <input type="text" name="tail_tid" value="{$model['tail_tid']}" placeholder="请输入公告落款key" autocomplete="off" class="layui-input">
+            </div>
+        <div class="layui-form-mid layui-word-aux">落款和落款key至少填一个</div>
+        </div>
+        {else /}
+        <div class="layui-form-item">
+            <label class="layui-form-label">新增图片</label>
+            <div class="layui-input-inline">
+                <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" id="picture-add">
+                    <i class="layui-icon">&#xe654;</i>
+                </button>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <table id="table" lay-filter="table"></table>
+        </div>
+        {/if}
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">开始时间</label>
+            <div class="layui-input-inline">
+                <input type="text" name="start_time" value="{$model['start_time']}" id="start_time" lay-verify="required" placeholder="yyyy-MM-dd HH:mm:ss" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">截止时间</label>
+            <div class="layui-input-inline">
+                <input type="text" name="end_time" value="{$model['end_time']}" id="end_time" lay-verify="required" placeholder="yyyy-MM-dd HH:mm:ss" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+    </div>
+    <div>{:token('token_edit_notice')}</div>
+    <div class="layui-form-item">
+        <div><input type="hidden" name="id" value="{$model['id']}"></div>
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="submit-edit">确定编辑</button>
+        </div>
+    </div>
+</form>
+<script type="text/html" id="bar">
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete">删除</a>
+</script>
+{/block}
+{block name="script"}
+<script>
+    layui.use(['jquery', 'form', 'laydate', 'table'], function () {
+        let $ = layui.jquery,
+            form = layui.form,
+            laydate = layui.laydate,
+            table = layui.table,
+            dataArr = JSON.parse('{:json_encode($model["picture"])}'),
+            tableClos = JSON.parse('{:json_encode($model::getPictureTableClos())}'),
+            jumpName = JSON.parse('{:json_encode($model::getJumpId())}');
+
+        // 日期
+        laydate.render({
+            elem: '#start_time',
+            type: 'datetime',
+            trigger: 'click',
+            format: 'yyyy-MM-dd HH:mm:ss',
+        });
+
+        laydate.render({
+            elem: '#end_time',
+            type: 'datetime',
+            trigger: 'click',
+            format: 'yyyy-MM-dd HH:mm:ss',
+        });
+
+        // 初始化
+        function init() {
+            if ({$model['show_type']} == {$model::PICTURE_NOTICE}) {
+                table.render({
+                    elem: '#table',
+                    cols: [tableClos],
+                    data: dataArr,
+                    size: 'sm',
+                });
+            }
+        }
+
+        init();
+
+        function getOnlyWorld() {
+            return '<div class="layui-form-item">\n' +
+                '{foreach $model::getLanguageList() as $key=>$vo }\n' +
+                '<div class="layui-inline">\n' +
+                '    <label class="layui-form-label">{$vo["name"]}标题</label>\n' +
+                '    <div class="layui-input-inline">\n' +
+                '        <input type="text" name="title[{$key}]" placeholder="请输入公告{$vo["name"]}标题" autocomplete="off" class="layui-input">\n' +
+                '    </div>\n' +
+                '</div>\n' +
+                '{/foreach}\n' +
+                '</div>\n' +
+                '<div class="layui-form-item">\n' +
+                '    <label class="layui-form-label">标题key</label>\n' +
+                '    <div class="layui-input-inline">\n' +
+                '        <input type="text" name="title_tid" placeholder="请输入公告标题key" autocomplete="off" class="layui-input">\n' +
+                '    </div>\n' +
+                '\t<div class="layui-form-mid layui-word-aux">标题和标题key至少填一个</div>\n' +
+                '</div>\n' +
+                '{foreach $model::getLanguageList() as $key=>$vo }\n' +
+                '<div class="layui-form-item">\n' +
+                '    <label class="layui-form-label">{$vo["name"]}内容</label>\n' +
+                '    <div class="layui-input-inline" style="width: 500px">\n' +
+                '        <textarea name="content[{$key}]" placeholder="请输入公告{$vo["name"]}内容" autocomplete="off" class="layui-textarea"></textarea>\n' +
+                '    </div>\n' +
+                '</div>\n' +
+                '{/foreach}\t\n' +
+                '<div class="layui-form-item">\n' +
+                '    <label class="layui-form-label">内容key</label>\n' +
+                '    <div class="layui-input-inline">\n' +
+                '        <input type="text" name="content_tid" placeholder="请输入公告内容key" autocomplete="off" class="layui-input">\n' +
+                '    </div>\n' +
+                '\t<div class="layui-form-mid layui-word-aux">内容和内容key至少填一个</div>\n' +
+                '</div>\n' +
+                '<div class="layui-form-item">\n' +
+                '{foreach $model::getLanguageList() as $key=>$vo }\n' +
+                '<div class="layui-inline">\n' +
+                '    <label class="layui-form-label">{$vo["name"]}落款</label>\n' +
+                '    <div class="layui-input-inline">\n' +
+                '        <input type="text" name="tail[{$key}]" placeholder="请输入公告{$vo["name"]}落款" autocomplete="off" class="layui-input">\n' +
+                '    </div>\n' +
+                '</div>\n' +
+                '{/foreach}\t\t\n' +
+                '</div>\n' +
+                '<div class="layui-form-item">\n' +
+                '    <label class="layui-form-label">落款key</label>\n' +
+                '    <div class="layui-input-inline">\n' +
+                '        <input type="text" name="tail_tid" placeholder="请输入公告落款key" autocomplete="off" class="layui-input">\n' +
+                '    </div>\n' +
+                '\t<div class="layui-form-mid layui-word-aux">落款和落款key至少填一个</div>\n' +
+                '</div>';
+        }
+
+        function getOnlyPicture() {
+            return '<div class="layui-form-item">\n' +
+                '    <label class="layui-form-label">新增图片</label>\n' +
+                '    <div class="layui-input-inline">\n' +
+                '        <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" id="picture-add">\n' +
+                '            <i class="layui-icon">&#xe654;</i>\n' +
+                '        </button>\n' +
+                '    </div>\n' +
+                '</div>\n' +
+                '<div class="layui-form-item">\n' +
+                '    <table id="table" lay-filter="table"></table>\n' +
+                '</div>';
+        }
+
+        form.on('select(show-type)', function (data) {
+            const div = $('#extra');
+            const value = data.value;
+            div.empty();
+            if (value) {
+                if (value == {$model::WORLD_NOTICE}) {
+                    div.append(getOnlyWorld());
+                } else {
+                    div.append(getOnlyPicture());
+                    dataArr = [];
+                    table.render({
+                        elem: '#table',
+                        cols: [tableClos],
+                        data: dataArr,
+                        size: 'sm',
+                    });
+                }
+            }
+        });
+
+        // 新增图片（未来元素）
+        $('body').on('click', '#picture-add', function () {
+            layer.open({
+                type: 2,
+                title: '新增图片',
+                shadeClose: true,
+                shade: 0.8,
+                area: ['70%', '80%'],
+                content: '{:url("index/gm.Notice/addPicture")}',
+            });
+        });
+
+        // 重载表格
+        function reloadTable() {
+            table.reload('table', {
+                data: dataArr  // 接受参数为Array
+            })
+        }
+
+        // 重组数组
+        function restructuringArray() {
+            for (let i = 0, length = dataArr.length; i < length; i++) {
+                dataArr[i].id = i;
+                dataArr[i].jump_name = jumpName[dataArr[i].jump_id];
+            }
+        }
+
+        // 添加图片
+        window.addPicture = function (obj) {
+            dataArr.push(obj);
+            restructuringArray();
+            reloadTable();
+        }
+
+        // 监听工具条
+        table.on('tool(table)', function (obj) {
+            if (obj.event === 'delete') {
+                layer.confirm('确定删除', function (index) {
+                    dataArr.splice(obj.data.id, 1);
+                    restructuringArray();
+                    reloadTable();
+                    layer.close(index);
+                });
+            }
+        });
+
+        // 监听提交
+        form.on('submit(submit-edit)', function (obj) {
+            obj.field.picture = dataArr;
+            $.post('{:url("index/gm.Notice/doEdit")}', obj.field, function (res) {
+                if (res.code == 0) {
+                    layer.msg(res.msg, {icon: 1, time: 500}, function () {
+                        let index = parent.layer.getFrameIndex(window.name);
+                        parent.layer.close(index);
+                        parent.layui.table.reload('table');
+                    });
+                } else {
+                    layer.msg(res.msg, {icon: 2});
+                }
+            });
+            return false
+        });
+    });
+</script>
+{/block}
