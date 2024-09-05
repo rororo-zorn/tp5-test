@@ -11,31 +11,31 @@
 
 return [
     // 数据库类型
-    'type'            => 'mysql',
+    'type'            => Env::get('backend_db.type'),
     // 服务器地址
-    'hostname'        => '127.0.0.1',
+    'hostname'        => Env::get('backend_db.hostname'),
     // 数据库名
-    'database'        => '',
+    'database'        => Env::get('backend_db.database'),
     // 用户名
-    'username'        => 'root',
+    'username'        => Env::get('backend_db.username'),
     // 密码
-    'password'        => '',
+    'password'        => Env::get('backend_db.password'),
     // 端口
-    'hostport'        => '',
+    'hostport'        => Env::get('backend_db.hostport'),
     // 连接dsn
     'dsn'             => '',
     // 数据库连接参数
     'params'          => [],
     // 数据库编码默认采用utf8
-    'charset'         => 'utf8',
+    'charset'         => Env::get('backend_db.charset'),
     // 数据库表前缀
-    'prefix'          => '',
+    'prefix'          => Env::get('backend_db.prefix'),
     // 数据库调试模式
-    'debug'           => true,
+    'debug'           => Env::get('backend_db.debug'),
     // 数据库部署方式:0 集中式(单一服务器),1 分布式(主从服务器)
-    'deploy'          => 0,
+    'deploy'          => Env::get('backend_db.deploy'),
     // 数据库读写是否分离 主从式有效
-    'rw_separate'     => false,
+    'rw_separate'     => Env::get('backend_db.rw_separate'),
     // 读写分离后 主服务器数量
     'master_num'      => 1,
     // 指定从服务器序号
@@ -60,4 +60,25 @@ return [
     'break_reconnect' => false,
     // 断线标识字符串
     'break_match_str' => [],
+    // game database config
+    'game_db'        => [
+        // 数据库部署方式:0 集中式(单一服务器),1 分布式(主从服务器)
+        'deploy'          => Env::get('game_db.deploy'),
+        // 数据库读写是否分离 主从式有效
+        'rw_separate'     => Env::get('game_db.rw_separate'),
+        // 数据库类型
+        'type'            => Env::get('game_db.type'),
+        // 服务器地址
+        'hostname'        => Env::get('game_db.hostname'),
+        // 数据库名
+        'database'        => Env::get('game_db.database'),
+        // 用户名
+        'username'        => Env::get('game_db.username'),
+        // 密码
+        'password'        => Env::get('game_db.password'),
+        // 端口
+        'hostport'        => Env::get('game_db.hostport'),
+        // 数据库调试模式
+        'debug'           => Env::get('game_db.debug'),
+    ],
 ];

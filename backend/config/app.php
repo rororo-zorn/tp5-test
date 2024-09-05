@@ -15,13 +15,13 @@
 
 return [
     // 应用名称
-    'app_name'               => '',
+    'app_name'               => Env::get('app.app_name'),
     // 应用地址
     'app_host'               => '',
     // 应用调试模式
-    'app_debug'              => false,
+    'app_debug'              => Env::get('app.app_debug'),
     // 应用Trace
-    'app_trace'              => false,
+    'app_trace'              => Env::get('app.app_trace'),
     // 是否支持多模块
     'app_multi_module'       => true,
     // 入口自动绑定模块
@@ -37,7 +37,7 @@ return [
     // 默认JSONP处理方法
     'var_jsonp_handler'      => 'callback',
     // 默认时区
-    'default_timezone'       => 'Asia/Shanghai',
+    'default_timezone'       => Env::get('app.time_zone'),
     // 是否开启多语言
     'lang_switch_on'         => false,
     // 默认全局过滤方法 用逗号分隔多个
@@ -64,7 +64,7 @@ return [
     // 默认验证器
     'default_validate'       => '',
     // 默认的空模块名
-    'empty_module'           => '',
+    'empty_module'           => Env::get('app.empty_module'),
     // 默认的空控制器名
     'empty_controller'       => 'Error',
     // 操作方法前缀
@@ -107,7 +107,7 @@ return [
     // 域名根，如thinkphp.cn
     'url_domain_root'        => '',
     // 是否自动转换URL中的控制器和操作名
-    'url_convert'            => true,
+    'url_convert'            => Env::get('app.url_convert'),
     // 默认的访问控制器层
     'url_controller_layer'   => 'controller',
     // 表单请求类型伪装变量
@@ -143,4 +143,6 @@ return [
     // 异常处理handle类 留空使用 \think\exception\Handle
     'exception_handle'       => '',
 
+    // 上线日期
+    'online_date' => Env::get('app.online_date'),
 ];
